@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <title>{{ reasource.name }}-{{ app.name }} docs</title>
+        <link type="text/css" rel="stylesheet" href="{{ url_for('API.API_Static', filename='docs/docs.css') }}"/>
+       <script>
+        class Data {}
+
+        function showhide(method, methodc){
+            var c = document.getElementById(method).querySelector("#doc")
+            if (c.style.display === "none"){
+                console.log(method, "none to block")
+                console.log(c.style.display)
+                var data = new Data().value = methodc["mimes"][0]["value"]
+                new changetype(method, data)
+                c.style.display = "block"
+            } else {
+                console.log(method, "none to block")
+                console.log(c.style.display)
+                c.style.display = "none"
+            }
+        }
+
+        function test_api(method){
+            window.open(method["url"], method=method["name"])
+            var responce = new fetch(method["url"], {method: method["name"]})
+            document.getElementById(method["name"]).querySelector("#responce").getElementsByTagName("p").innerHTML = responce.json()
+        }
+
+        var previoustype = {}
+        function changetype(method, option){
+            var type = document.getElementById(method).querySelector(option.value)
+            type.style.display = "block"
+            previoustype[method].style.display = "none"
+            console.log(previoustype)
+            previoustype[method] = type
+        }
+       </script>
+    </head>
+    <body>
+        <h1>{{ reasource.name }}</h1>
+        <div>
+            {% for method in reasource.help %}
+            <div id="{{ method.name }}" class="method">
+            <button class="method"  style="display:block;" onclick="showhide({{ method.name }}, {{ method }} )">
+                    <div>
+                        <h2>{{ method.name }}</h2>
+                        {# <button onclick="showhide('{{ method.name }}')">Show</button> #}
+                    </div>
+                </button>
+                <select  id="select {{ method.name }}" onchange="changetype( {{ method.name }}, this)">
+                    {% for type in method.types %}
+                    <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+                {% for mime in method.mimes %}
+                <div id="doc {{ mime.type }}" style="display: none;">
+                    <h3>Help</h3>
+                    <p>{{ method.help }}</p>
+                    <div id="{{ mime.type }}">
+                        {% for input in method.inputs %}
+                        <input type="{{ input.type }}"/>
+                        {% endfor %}
+                        <button onclick="test_api({{ method }})">Test</button>
+                    </div>
+                </div>
+                {% endfor %}
+                
+            </div>
+            {% endfor %}
+        </div>
